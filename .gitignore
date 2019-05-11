@@ -1,0 +1,3 @@
+*.code-workspace
+Classes/__pycache__/
+.vscode/
