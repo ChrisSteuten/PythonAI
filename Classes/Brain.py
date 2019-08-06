@@ -1,15 +1,16 @@
 import threading
+import json
 from .BrainArea import BrainArea
 
 class Brain(object):
-    __name = ''
-    __brainAreas = []
 
     def __init__(self,parName):
+        self.__name = ''
+        self.__brainAreas = []
         self.__name = parName
 
     def __str__(self):
-        tempString = ''
+        tempString = self.__name
         for brainArea in self.__brainAreas:
             tempString += '/' + str(brainArea)
         return tempString
@@ -20,6 +21,9 @@ class Brain(object):
     def GetBrainArea(self, key):
         return self.__brainAreas[key]
 
+    def GetAllBrainAreas(self):
+        return self.__brainAreas
+
     def GetBrainAreasCount(self):
         return len(self.__brainAreas)
 
@@ -28,10 +32,10 @@ class Brain(object):
         self.__brainAreas.append(parBrainArea)
 
     def GetAllNeurons(self):
-        tempNeuronList = []
+        tempNeuronTable = {}
         for brainArea in self.__brainAreas:
-            tempNeuronList.extend(brainArea.GetAllNeurons())
-        return tempNeuronList
+            tempNeuronTable = {**tempNeuronTable, **brainArea.GetAllNeurons()}
+        return tempNeuronTable
 
     def ActivateBrainArea(self, parNo, inputValues):
         threading.Thread(target=self.__brainAreas[parNo], args=inputValues).start()

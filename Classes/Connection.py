@@ -2,15 +2,15 @@ from .Neuron import Neuron
 from random import uniform
 
 class Connection(object):
-    __value = 0.0
-    __weight = 0.0
-    __from = Neuron
-    __to = Neuron
-    __triggered = False
 
     def __init__(self, parFrom, parTo, parWeight=None):
+        self.__value = 0.0
+        self.__weight = 0.0
+        self.__from = Neuron
         self.__from = parFrom
+        self.__to = Neuron
         self.__to = parTo
+        self.__triggered = False
         if not parWeight: parWeight = uniform(-1,1)
         self.__weight = parWeight
 
@@ -41,5 +41,27 @@ class Connection(object):
     def SetTriggered(self, parValue):
         self.__triggered = parValue
 
+        if parValue == True:
+            self.__to.Activate()
+
     def GetTriggered(self):
         return self.__triggered
+
+    def GetInputPrediction(self):       
+        fromNeuron = self.GetFromNeuron()
+        if len(fromNeuron.GetAllInputConnections()) == 0:
+            return fromNeuron.GetValue()
+        
+        prediction = 0.0
+        for connection in fromNeuron.GetAllInputConnections():
+            prediction += connection.GetOutputPrediction()
+
+        return fromNeuron.GetFunction()(prediction)
+
+    def GetOutputPrediction(self):       
+        fromNeuron = self.GetFromNeuron()
+        if len(fromNeuron.GetAllInputConnections()) == 0:
+            return fromNeuron.GetValue() * self.GetWeight()
+
+        return self.GetInputPrediction() * self.GetWeight()
+        

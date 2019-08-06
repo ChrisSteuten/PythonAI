@@ -2,67 +2,99 @@ from Classes.Brain import Brain
 from Classes.BrainArea import BrainArea
 from Classes.Layer import Layer
 from Classes.Neuron import Neuron
-from Classes.Connection import Connection
 from uuid import uuid4
+import json
+import math
+import datetime
+import itertools
+from statistics import mean
 
 
-
-def main():
+def main1():
 
     brain = Brain('Tom')
 
-    brainArea = BrainArea('Test')
+    brain.AddBrainArea()
+    
+    for brainArea in brain.GetAllBrainAreas():
 
-    layer0 = Layer(0)
-    layer1 = Layer(1)
-    layer2 = Layer(2)
+        brainArea.AddLayer()
+        brainArea.AddLayer()
+        #brainArea.AddLayer()
 
-    neuron00 = Neuron(0)
-    neuron01 = Neuron(0)
-    neuron02 = Neuron(0)
-    neuron10 = Neuron(1)
-    neuron11 = Neuron(1)
-    neuron12 = Neuron(1)
-    neuron20 = Neuron(2)
-    neuron21 = Neuron(2)
-    neuron22 = Neuron(2)
+        layer0 = brainArea.GetLayer(0)
+        layer1 = brainArea.GetLayer(1)
+        #layer2 = brainArea.GetLayer(2)
 
-    layer0.AddNeuron(neuron00)
-    layer0.AddNeuron(neuron01)
-    layer0.AddNeuron(neuron02)
-    layer1.AddNeuron(neuron10)
-    layer1.AddNeuron(neuron11)
-    layer1.AddNeuron(neuron12)
-    layer2.AddNeuron(neuron20)
-    layer2.AddNeuron(neuron21)
-    layer2.AddNeuron(neuron22)
+        layer0.AddNeuron()
+        layer0.AddNeuron()
+        #layer0.AddNeuron()
 
-    connection0010 = Connection(neuron00, neuron10)
-    connection0011 = Connection(neuron00, neuron11)
-    connection0012 = Connection(neuron00, neuron12)
-    connection0110 = Connection(neuron01, neuron10)
-    connection0111 = Connection(neuron01, neuron11)
-    connection0112 = Connection(neuron01, neuron12)
-    connection0210 = Connection(neuron02, neuron10)
-    connection0211 = Connection(neuron02, neuron11)
-    connection0212 = Connection(neuron02, neuron12)
-    connection1020 = Connection(neuron10, neuron20)
-    connection1021 = Connection(neuron10, neuron21)
-    connection1022 = Connection(neuron10, neuron22)
-    connection1120 = Connection(neuron11, neuron20)
-    connection1121 = Connection(neuron11, neuron21)
-    connection1122 = Connection(neuron11, neuron22)
-    connection1220 = Connection(neuron12, neuron20)
-    connection1221 = Connection(neuron12, neuron21)
-    connection1222 = Connection(neuron12, neuron22)
+        layer1.AddNeuron()
+        #layer1.AddNeuron()
+        #layer1.AddNeuron()
 
-    brainArea.AddLayer(layer0)
-    brainArea.AddLayer(layer1)
-    brainArea.AddLayer(layer2)
+        #layer2.AddNeuron()
+        #layer2.AddNeuron()
+        #layer2.AddNeuron()
 
-    brain.AddBrainArea(brainArea)
+        currentLayerIndex = 0
+        while currentLayerIndex < len(brainArea.GetAllLayers()) - 1:
+            currentLayer = brainArea.GetLayer(currentLayerIndex)
+            currentLayer.ConnectToLayer(brainArea.GetLayer(currentLayerIndex + 1))
+            currentLayerIndex += 1
 
+    print('\n')
+
+    print('/ = Start of new brain area')
+    print('+ = Start of new layer')
+    print('; = Start of new neuron')
+
+    print('\n')
+    
+    print('Brain:')
     print(str(brain))
+
+    print('\n')
+
+    print('Connections:')
+    for key, neuron in brain.GetAllNeurons().items():
+        for connection in neuron.GetAllOutputConnections():
+            print(str(connection.GetFromNeuron()) + '-->' + str(connection.GetToNeuron()))
+        print()
+
+    currentBrainArea = brain.GetBrainArea(0)
+    inputValues = [2,3]
+    expectedOutputValues = [6]
+    outputValues = []
+    
+    start = datetime.datetime.now().timestamp()
+
+    i = 0
+    for key, neuron in currentBrainArea.GetOutputLayer().GetAllNeurons().items():
+        neuron.SetExpectedValue(expectedOutputValues[i])
+        i += 1
+
+    results = []
+    while outputValues != expectedOutputValues:
+        #Clear output values
+        outputValues = []
+        
+
+        #Activate simulation
+        currentBrainArea.Activate(inputValues)
+
+        #Get output values
+        for key, neuron in currentBrainArea.GetOutputLayer().GetAllNeurons().items():
+            outputValues.append(neuron.GetValue())
+
+        if outputValues != expectedOutputValues:
+            results = currentBrainArea.Optimize(outputValues, expectedOutputValues, results)
+
+    print()
+    print('Runtime: ' + str(((datetime.datetime.now().timestamp() - start) * 1000)) + ' ms') 
+
     return
 
-if __name__ == '__main__': main()
+if __name__ == '__main__': 
+    main1()
