@@ -82,12 +82,12 @@ class BrainArea(object):
 
     def GetOutputPrediction(self, inputValues):
         counter = 0
-        for key, neuron in self.GetInputLayer().GetAllNeurons().items():
+        for _key, neuron in self.GetInputLayer().GetAllNeurons().items():
             neuron.SetValue(inputValues[counter])
             counter += 1
         
         predictions = []
-        for key, neuron in self.GetOutputLayer().GetAllNeurons().items():
+        for _key, neuron in self.GetOutputLayer().GetAllNeurons().items():
             currPrediction = 0.0
             for connection in neuron.GetAllInputConnections():
                 currPrediction += connection.GetOutputPrediction()
@@ -104,7 +104,7 @@ class BrainArea(object):
 
         #threads = []
         counter = 0
-        for key, neuron in self.GetInputLayer().GetAllNeurons().items():
+        for _key, neuron in self.GetInputLayer().GetAllNeurons().items():
             neuron.SetValue(inputValues[counter])
             neuron.Activate()
             counter += 1
@@ -143,7 +143,8 @@ class BrainArea(object):
                 print('Errors: ' + str(errors).strip('[]'))
 
             for layer in self.GetAllLayers():
-                for key, neuron in layer.GetAllNeurons().items():
+                for _key, neuron in layer.GetAllNeurons().items():
+
                     for connection in neuron.GetAllInputConnections():
                         currWeight = connection.GetWeight()
                         currValue = connection.GetValue()
@@ -180,7 +181,7 @@ class BrainArea(object):
 
     def ResetConnectionsTriggerStatus(self):
         for layer in self.__layers:
-            for key, neuron in layer.GetAllNeurons().items():
+            for _key, neuron in layer.GetAllNeurons().items():
                 for connection in neuron.GetAllOutputConnections():
                     connection.SetTriggered(False)
 

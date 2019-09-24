@@ -38,7 +38,7 @@ class Layer(object):
 
     def SetFunction(self,parFunction):
         self.__function = parFunction
-        for key, neuron in self.__neurons.items():
+        for _key, neuron in self.__neurons.items():
             neuron.SetFunction(parFunction)
 
     def GetLevel(self):
@@ -52,14 +52,14 @@ class Layer(object):
             del self.__neurons[str(neuron)]
 
     def ConnectToLayer(self, parConnectToLayer):
-        for fromKey, fromNeuron in self.GetAllNeurons().items():
-            for toKey,toNeuron in parConnectToLayer.GetAllNeurons().items():
+        for _fromKey, fromNeuron in self.GetAllNeurons().items():
+            for _toKey, toNeuron in parConnectToLayer.GetAllNeurons().items():
                 Connection(fromNeuron, toNeuron)
 
     def RemoveOutputConnections(self):
-        for key, neuron in self.GetAllNeurons().items():
+        for _key, neuron in self.GetAllNeurons().items():
             neuron.RemoveAllOutputConnections()
 
     def RemoveInputConnections(self):
-        for key, neuron in self.GetAllNeurons().items():
+        for _key, neuron in self.GetAllNeurons().items():
             neuron.RemoveAllInputConnections()

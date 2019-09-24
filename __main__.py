@@ -58,7 +58,7 @@ def main1():
     print('\n')
 
     print('Connections:')
-    for key, neuron in brain.GetAllNeurons().items():
+    for _key, neuron in brain.GetAllNeurons().items():
         for connection in neuron.GetAllOutputConnections():
             print(str(connection.GetFromNeuron()) + '-->' + str(connection.GetToNeuron()))
         print()
@@ -71,7 +71,7 @@ def main1():
     start = datetime.datetime.now().timestamp()
 
     i = 0
-    for key, neuron in currentBrainArea.GetOutputLayer().GetAllNeurons().items():
+    for _key, neuron in currentBrainArea.GetOutputLayer().GetAllNeurons().items():
         neuron.SetExpectedValue(expectedOutputValues[i])
         i += 1
 
@@ -85,7 +85,7 @@ def main1():
         currentBrainArea.Activate(inputValues)
 
         #Get output values
-        for key, neuron in currentBrainArea.GetOutputLayer().GetAllNeurons().items():
+        for _key, neuron in currentBrainArea.GetOutputLayer().GetAllNeurons().items():
             outputValues.append(neuron.GetValue())
 
         if outputValues != expectedOutputValues:
