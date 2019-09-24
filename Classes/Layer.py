@@ -31,6 +31,7 @@ class Layer(object):
         else:
             neuron.SetLayerLevel(self.__level)
             neuron.SetFunction(self.__function)
+        
         self.__neurons[str(neuron)] = neuron
 
     def GetFunction(self):
@@ -63,3 +64,11 @@ class Layer(object):
     def RemoveInputConnections(self):
         for _key, neuron in self.GetAllNeurons().items():
             neuron.RemoveAllInputConnections()
+
+    def RebuildConnections(self):
+        self.RemoveInputConnections()
+        self.RemoveOutputConnections()
+
+        self.ConnectToLayer(self.__level - 1)
+        self.ConnectToLayer(self.__level + 1)
+

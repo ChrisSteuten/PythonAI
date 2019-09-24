@@ -1,6 +1,8 @@
 import threading
+from math import ceil, trunc
 from .Functions import activationFunctions
 from random import randint
+
 
 def AllThreadsStopped(parThreadList):
     for thread in parThreadList:
@@ -20,10 +22,12 @@ def GetRandomFunction():
 
 def GetNumBeforePoint(x):
     s = str(x)
+    s = s.replace('-', '')
+    
     if not '.' in s:
         return len(s)
 
-    return s.index('.') - 1
+    return s.index('.')
     
 def GetZeroAfterPoint(x):
     s = str(x)
@@ -41,3 +45,13 @@ def GetZeroAfterPoint(x):
             return count
 
     return count
+
+def RoundUp(number, decimals=0):
+    multiplier = 10 ** decimals
+    return(ceil(number + multiplier) / multiplier)
+
+def truncate(number):
+    return(trunc(number))
+
+
+

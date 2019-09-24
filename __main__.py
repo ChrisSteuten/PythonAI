@@ -9,10 +9,9 @@ import datetime
 import itertools
 from statistics import mean
 
-
 def main1():
 
-    brain = Brain('Tom')
+    brain = Brain('Bob')
 
     brain.AddBrainArea()
     
@@ -65,7 +64,7 @@ def main1():
 
     currentBrainArea = brain.GetBrainArea(0)
     inputValues = [2,3]
-    expectedOutputValues = [6]
+    expectedOutputValues = [5]
     outputValues = []
     
     start = datetime.datetime.now().timestamp()

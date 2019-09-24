@@ -53,7 +53,6 @@ class Neuron(object):
     def SetLayerLevel(self, parLayerLevel):
         self.__layerLevel = parLayerLevel
 
-
     def GetID(self):
         return self.__id
 

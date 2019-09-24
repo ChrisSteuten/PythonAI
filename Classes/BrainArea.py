@@ -1,8 +1,8 @@
 from .Layer import Layer
 import threading
 from time import sleep
-from math import isnan, isinf
-from .Helper import GetRandomFunction, GetZeroAfterPoint, GetNumBeforePoint
+from math import isnan, isinf, pow
+from .Helper import GetRandomFunction, GetZeroAfterPoint, GetNumBeforePoint, truncate
 from .Settings import extendedDebugging
 
 class BrainArea(object):
@@ -120,17 +120,22 @@ class BrainArea(object):
             results.append(outputValues)
             print('Output Values: ' + str(outputValues).strip('[]'))
 
-            #Calculate error
+            #Calculate error and learning rate
             expectedAndActualOutputValues = zip(expectedOutputValues, outputValues)
             for expectedValue, actualValue in expectedAndActualOutputValues:
-                errors.append(expectedValue - actualValue)
+                error = expectedValue - actualValue
+                errors.append(error)
                 
-                newLearningRate = 1
+                newLearningRate = 1            
+                
+                if truncate(error) != 0:
+                    numbersBeforeDecimalPoint = GetNumBeforePoint(error)
+                    newLearningRate = pow(10, numbersBeforeDecimalPoint - 1)
 
-                if (newLearningRate == 1):
-                    zerosAfterDecimalPointCount = GetZeroAfterPoint(expectedValue - actualValue)
+                else:
+                    zerosAfterDecimalPointCount = GetZeroAfterPoint(error)
+
                     i = 0
-
                     if zerosAfterDecimalPointCount > 0:
                         newLearningRate /= 10
                         while i < zerosAfterDecimalPointCount:
@@ -142,6 +147,7 @@ class BrainArea(object):
             if extendedDebugging:
                 print('Errors: ' + str(errors).strip('[]'))
 
+            _allLayers = self.GetAllLayers()
             for layer in self.GetAllLayers():
                 for _key, neuron in layer.GetAllNeurons().items():
 
@@ -151,29 +157,41 @@ class BrainArea(object):
                         inputPrediction = connection.GetInputPrediction()
                         outputPrediction = connection.GetOutputPrediction()
 
+                        #print('newWeight = ' + str(currWeight) + ' - ' + str(learningRate) + ' * (' + str(outputPrediction) + ' - ' + str(currValue) + ') * ' + str(inputPrediction))
                         newWeight = currWeight - learningRate * (outputPrediction - currValue) * inputPrediction
+                        #print('newWeight = ' + str(newWeight))
 
                         if isnan(newWeight) or isinf(newWeight):
                             print('nan!')
-
-                        connection.SetWeight(newWeight)
+                        else:
+                            connection.SetWeight(newWeight)
 
             lastHundredResults = results[-100:]
 
             if len(lastHundredResults) == 100:
 
                 averages = [float(sum(col))/len(col) for col in zip(*lastHundredResults)]
-                firstLastHundredResults = lastHundredResults[0]
                 lastLastHundredResults = lastHundredResults[-1]
 
-                if ((not averages != self.__oldAverages) and (firstLastHundredResults == lastLastHundredResults)) or (isnan(lastLastHundredResults[0]) or isinf(lastLastHundredResults[0])):
+                if ((not averages != self.__oldAverages) or (isnan(lastLastHundredResults[0]) or isinf(lastLastHundredResults[0]))):
                     if self.__functionShuffleCount < len(self.GetAllLayers()):
                         self.ShuffleFunctions()
-                        self.__oldAverages = None
                     else:
+                        #if (len(self.__layers) > 2) and (len(self.__layers[-2].GetAllNeurons()) < 10):
+                        #    lastHiddenLayer = self.__layers[-2]
+                        #    lastHiddenLayer.AddNeuron()
+                        #    lastHiddenLayer.RemoveInputConnections()
+                        #    lastHiddenLayer.RemoveOutputConnections()
+                        #    self.__layers[-3].ConnectToLayer(lastHiddenLayer)
+                        #    lastHiddenLayer.ConnectToLayer(self.__layers[-1])
+                        #    self.__functionShuffleCount = 0
+                        #else:
                         self.__functionShuffleCount = 0
-                        self.__oldAverages = None
                         self.AddHiddenLayer()
+
+                    self.__oldAverages = None
+                    results.clear()
+                    self.ResetWeights()
 
                 self.__oldAverages = averages
         return results
@@ -193,4 +211,10 @@ class BrainArea(object):
         for layer in self.GetAllLayers():
             layer.SetFunction(GetRandomFunction())
 
-        
+    def ResetWeights(self):
+        for _key, neuron in self.GetAllNeurons().items():
+            for connection in neuron.GetAllOutputConnections():
+                connection.ResetWeight()
+
+            for connection in neuron.GetAllInputConnections():
+                connection.ResetWeight()

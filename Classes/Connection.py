@@ -13,6 +13,7 @@ class Connection(object):
         self.__triggered = False
         if not parWeight: parWeight = uniform(-1,1)
         self.__weight = parWeight
+        self.__originWeight = parWeight
 
         parFrom.AddOutputConnection(self)
         parTo.AddInputConnection(self)
@@ -20,11 +21,20 @@ class Connection(object):
     def __str__(self):
         return str(self.__from) + ':' + str(self.__to)
 
-    def SetWeight(self, parWeight):
+    def SetWeight(self, parWeight):        
+        while parWeight > 1 or parWeight < -1:
+            parWeight /= 10.
+
+        #while parWeight < -1:
+        #    parWeight *= 10
+
         self.__weight = parWeight
 
     def GetWeight(self):
         return self.__weight
+
+    def ResetWeight(self):
+        self.__weight = self.__originWeight
 
     def SetValue(self, parValue):
         self.__value = parValue
