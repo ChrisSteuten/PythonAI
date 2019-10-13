@@ -20,6 +20,16 @@ def WeightedSum(parConnectionList):
 def GetRandomFunction():
     return activationFunctions[randint(0, len(activationFunctions) - 1)]
 
+def GetFirstFunction():
+    return activationFunctions[0]
+
+def GetNextFunction(currentFunction):
+    currentFunctionIndex = activationFunctions.index(currentFunction)
+    if currentFunctionIndex < len(activationFunctions) - 1:
+        return activationFunctions[currentFunctionIndex + 1]
+    
+    return None
+
 def GetNumBeforePoint(x):
     s = str(x)
     s = s.replace('-', '')

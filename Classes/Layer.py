@@ -12,7 +12,8 @@ class Layer(object):
         self.__function = None
         self.__level = parLevel
         if not parFunction:
-            parFunction = GetRandomFunction()
+            #parFunction = GetRandomFunction()
+            parFunction = activationFunctions[0]
         self.__function = parFunction
 
 

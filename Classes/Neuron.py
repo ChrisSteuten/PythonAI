@@ -11,11 +11,9 @@ class Neuron(object):
     def __init__(self, parLayerLevel, parFunction, parID=None):
         self.__inputConnections = []
         self.__outputConnections = []
-        self.__layerLevel = 0
         self.__id = 0
         self.__value = 0
         self.__expectedValue = 0
-        self.__function = None
         self.__layerLevel = parLayerLevel
         self.__function = parFunction
         

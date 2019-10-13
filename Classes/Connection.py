@@ -1,5 +1,7 @@
 from .Neuron import Neuron
 from random import uniform
+from math import exp
+from sys import float_info
 
 class Connection(object):
 
@@ -11,7 +13,7 @@ class Connection(object):
         self.__to = Neuron
         self.__to = parTo
         self.__triggered = False
-        if not parWeight: parWeight = uniform(-1,1)
+        if not parWeight: parWeight = 0#uniform(-1,1)
         self.__weight = parWeight
         self.__originWeight = parWeight
 
@@ -22,11 +24,13 @@ class Connection(object):
         return str(self.__from) + ':' + str(self.__to)
 
     def SetWeight(self, parWeight):        
-        while parWeight > 1 or parWeight < -1:
-            parWeight /= 10.
+        #while parWeight > 1 or parWeight < -1:
+            #parWeight /= 10.
 
-        #while parWeight < -1:
-        #    parWeight *= 10
+        try:
+            parWeight = 1 / (1 + exp(-parWeight))
+        except OverflowError:
+            parWeight = 1 / float_info.max
 
         self.__weight = parWeight
 
@@ -59,7 +63,7 @@ class Connection(object):
 
     def GetInputPrediction(self):       
         fromNeuron = self.GetFromNeuron()
-        if len(fromNeuron.GetAllInputConnections()) == 0:
+        if len(fromNeuron.GetAllInputConnections()) == 0: #Input Neuron
             return fromNeuron.GetValue()
         
         prediction = 0.0
@@ -70,7 +74,7 @@ class Connection(object):
 
     def GetOutputPrediction(self):       
         fromNeuron = self.GetFromNeuron()
-        if len(fromNeuron.GetAllInputConnections()) == 0:
+        if len(fromNeuron.GetAllInputConnections()) == 0: #Input Neuron
             return fromNeuron.GetValue() * self.GetWeight()
 
         return self.GetInputPrediction() * self.GetWeight()

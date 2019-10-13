@@ -64,7 +64,7 @@ def main1():
 
     currentBrainArea = brain.GetBrainArea(0)
     inputValues = [2,3]
-    expectedOutputValues = [5]
+    expectedOutputValues = [6]
     outputValues = []
     
     start = datetime.datetime.now().timestamp()
@@ -90,6 +90,7 @@ def main1():
         if outputValues != expectedOutputValues:
             results = currentBrainArea.Optimize(outputValues, expectedOutputValues, results)
 
+    print(outputValues)
     print()
     print('Runtime: ' + str(((datetime.datetime.now().timestamp() - start) * 1000)) + ' ms') 
 

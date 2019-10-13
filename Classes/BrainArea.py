@@ -4,6 +4,7 @@ from time import sleep
 from math import isnan, isinf, pow
 from .Helper import GetRandomFunction, GetZeroAfterPoint, GetNumBeforePoint, truncate
 from .Settings import extendedDebugging
+from .Functions import activationFunctions
 
 class BrainArea(object):
 
@@ -13,7 +14,7 @@ class BrainArea(object):
         self.__isWorking = False
         self.__purpose = parPurpose
         self.__oldAverages = None
-        self.__functionShuffleCount = 0
+        self.__functionIterationHelp = 0
 
     def __str__(self):
         tempString = ''
@@ -142,7 +143,7 @@ class BrainArea(object):
                             newLearningRate /= 10
                             i += 1
 
-                learningRate = newLearningRate           
+                learningRate = newLearningRate / 10    
 
             if extendedDebugging:
                 print('Errors: ' + str(errors).strip('[]'))
@@ -174,19 +175,7 @@ class BrainArea(object):
                 lastLastHundredResults = lastHundredResults[-1]
 
                 if ((not averages != self.__oldAverages) or (isnan(lastLastHundredResults[0]) or isinf(lastLastHundredResults[0]))):
-                    if self.__functionShuffleCount < len(self.GetAllLayers()):
-                        self.ShuffleFunctions()
-                    else:
-                        #if (len(self.__layers) > 2) and (len(self.__layers[-2].GetAllNeurons()) < 10):
-                        #    lastHiddenLayer = self.__layers[-2]
-                        #    lastHiddenLayer.AddNeuron()
-                        #    lastHiddenLayer.RemoveInputConnections()
-                        #    lastHiddenLayer.RemoveOutputConnections()
-                        #    self.__layers[-3].ConnectToLayer(lastHiddenLayer)
-                        #    lastHiddenLayer.ConnectToLayer(self.__layers[-1])
-                        #    self.__functionShuffleCount = 0
-                        #else:
-                        self.__functionShuffleCount = 0
+                    if not self.SetupNextFunctionIteration():
                         self.AddHiddenLayer()
 
                     self.__oldAverages = None
@@ -195,6 +184,51 @@ class BrainArea(object):
 
                 self.__oldAverages = averages
         return results
+
+
+    def SetupNextFunctionIteration(self):
+        functionIndexList = self.BuildFunctionIndexList()
+
+        functionIndexList = self.IncreaseFunctionIndexList(functionIndexList)
+
+        self.ApplyFunctionIndexList(functionIndexList)
+
+        if all(elem == 0 for elem in functionIndexList):
+            return False
+        
+
+        return True
+
+    def BuildFunctionIndexList(self):
+        functionIndexList = []
+        for layer in self.GetAllLayers():
+            layerFunctionName = layer.GetFunction().__name__
+            functionIndex = 0
+            for activationFunction in activationFunctions:
+                if activationFunction.__name__ == layerFunctionName:
+                    break
+                functionIndex += 1
+            functionIndexList.append(functionIndex)
+
+        return functionIndexList
+
+    def IncreaseFunctionIndexList(self, functionIndexList):
+        i = -1
+        while i < len(functionIndexList) - 1:
+            i += 1
+            if (functionIndexList[i] < len(activationFunctions) - 1):
+                functionIndexList[i] += 1
+                break
+            else:
+                functionIndexList[i] = 0
+
+        return functionIndexList
+
+    def ApplyFunctionIndexList(self, functionIndexList):
+        i = 0
+        for index in functionIndexList:
+            self.GetLayer(i).SetFunction(activationFunctions[index])
+            i += 1
 
 
     def ResetConnectionsTriggerStatus(self):
@@ -206,10 +240,10 @@ class BrainArea(object):
                 for connection in neuron.GetAllInputConnections():
                     connection.SetTriggered(False)
 
-    def ShuffleFunctions(self):
-        self.__functionShuffleCount += 1
-        for layer in self.GetAllLayers():
-            layer.SetFunction(GetRandomFunction())
+    #def ShuffleFunctions(self):
+    #    self.__functionShuffleCount += 1
+    #    for layer in self.GetAllLayers():
+    #        layer.SetFunction(GetRandomFunction())
 
     def ResetWeights(self):
         for _key, neuron in self.GetAllNeurons().items():
